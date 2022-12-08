@@ -13,7 +13,7 @@ module.exports = todosController = {
 
     try {
 
-      const todo = await Todo.findByIdan(id)
+      const todo = await Todo.findById(id)
      
         if(todo.user.toString() === req.user.id) {
             await todo.remove()
@@ -38,18 +38,48 @@ module.exports = todosController = {
       return res.status(401).json(error + "Неверный токен");
     }
   },
-  editTodo: async (req, res) => {
+  deleteTodo: async (req, res) => {
+    const { id } = req.params;
+
     try {
-      const todo = await Todos.findByIdAndUpdate(
-        req.params.id,
-        {
-          completed: req.body.completed,
-        },
-        { new: true }
-      );
-      res.json(todo);
+
+      const todo = await Todo.findById(id)
+     
+        if(todo.user.toString() === req.user.id) {
+            await todo.remove()
+
+            return res.json('удалено');
+        }
+        return res.status(401).json('ошибка. Нет доступа!')
+
     } catch (error) {
-      res.json({ error: error.message });
+      return res.status(401).json("Ошибка" + error);
     }
   },
+  editTodo: async (req, res) => {
+    const {id} = req.params
+    const { completed } = req.body;
+    try {
+      const todo = await Todo.findById(id)
+     
+        if(todo.user.toString() === req.user.id) {
+            await todo.update({completed: completed})
+
+            return res.json('изменено');
+        }
+
+      return res.json(todo);
+    } catch (error) {
+      return res.status(401).json(error + "Неверный токен");
+    }
+  },
+  getTodoByUserId: async (req, res) => {
+    const {userId} = req.params
+    try {
+      const todo = await Todo.find({user: userId})
+      return res.json(todo)
+    } catch (error) {
+      res.json(error)
+    }
+  }
 };

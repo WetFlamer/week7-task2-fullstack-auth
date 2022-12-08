@@ -8,7 +8,6 @@ const Todos = () => {
     const todos = useSelector((state) => state.todos.todos);
     const error = useSelector((state) => state.todos.error);
     const loading = useSelector((state) => state.todos.loading);
-  
     const [text, setText] = useState('')
   
     const handleTextEdit = (e) => {
@@ -18,13 +17,10 @@ const Todos = () => {
       dispatch(addTodo({text}))
       setText('')
     }
-  
-  
-  
     useEffect(() => {
-      dispatch(fetchTodos());
+      dispatch(fetchTodos())
     }, [dispatch]);
-  
+
     if (loading) {
       return <h1>...LOADING</h1>;
     }
@@ -45,6 +41,7 @@ const Todos = () => {
             <Todo
               key={todo._id}
             id={todo._id}
+            userId={todo.user}
               text={todo.text}
               completed={todo.completed}
               loading={todo.loading}

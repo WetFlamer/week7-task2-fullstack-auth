@@ -49,7 +49,7 @@ module.exports = usersController = {
       expiresIn: '24h'
     })
 
-    res.json(token)
+    res.json({token, id: payload.id})
   } catch (error){return res.json(error)}
   }
 };

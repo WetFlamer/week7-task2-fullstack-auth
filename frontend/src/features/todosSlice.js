@@ -30,7 +30,11 @@ export const addTodo = createAsyncThunk(
     try {
       const res = await fetch("http://localhost:4000/todos", {
         method: "POST",
-        headers: { "Content-type": "application/json" },
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${thunkAPI.getState().application.token}
+        `,
+        },
         body: JSON.stringify({ text: data.text }),
       });
       const todos = await res.json();
@@ -52,7 +56,10 @@ export const deleteTodo = createAsyncThunk(
     try {
       const res = await fetch(`http://localhost:4000/todos/${data.id}`, {
         method: "DELETE",
-        headers: { "Content-type": "application/json" },
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${thunkAPI.getState().application.token}`,
+        },
       });
       const todos = await res.json();
       if (todos.error) {
@@ -73,7 +80,10 @@ export const completeTodo = createAsyncThunk(
       const res = await fetch(`http://localhost:4000/todos/${data.id}`, {
         method: "PATCH",
         body: JSON.stringify({ completed: !data.completed }),
-        headers: { "Content-type": "application/json" },
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${thunkAPI.getState().application.token}`,
+        },
       });
       const todos = await res.json();
       if (todos.error) {
@@ -97,8 +107,8 @@ const todosSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchTodos.fulfilled, (state, action) => {
-        state.todos = action.payload;
         state.loading = false;
+          state.todos = action.payload;
       })
       .addCase(fetchTodos.rejected, (state, action) => {
         state.error = action.payload;
@@ -161,9 +171,11 @@ const todosSlice = createSlice({
         state.loading = false;
         state.error = null;
         state.todos = state.todos.filter((todo) => {
-          console.log(action.payload._id + 'ACTION PAYLOAD')
           if (todo._id === action.payload._id) {
-            return todo;
+            return false;
+          }
+          if (todo.deleted) {
+            return false;
           }
           return todo;
         });
